@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
+import React, { useEffect, useState, useTransition } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -8,6 +8,7 @@ import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
   aspectRatioOptions,
+  creditFee,
   defaultValues,
   transformationTypes,
 } from "@/constant";
@@ -27,6 +28,7 @@ import TransformedImage from "./TransformedImage";
 import { getCldImageUrl } from "next-cloudinary";
 import { addImage, updateImage } from "@/lib/actions/image.action";
 import { useRouter } from "next/navigation";
+import { InsufficientCreditsModal } from "./InsufficientCreditsModel";
 
 export const formSchema = z.object({
   title: z.string(),
@@ -183,7 +185,7 @@ const TransformationForm = ({
     }, 1000);
   };
 
-  //   TODO: Change credit Fee to something else if needed
+  //   TODO: Change credit Fee in constant to something else if needed
   const onTransformHandler = async () => {
     setTransformStatus("transforming");
 
@@ -194,17 +196,27 @@ const TransformationForm = ({
     setNewTransformation(null);
 
     startTransition(async () => {
-      await updateCredits(userId, -1);
+      await updateCredits(userId, creditFee);
     });
   };
 
   //   Handle submit/transform status
   const isSubmitting = submitStatus === "submitting";
   const isTransforming = transformStatus === "transforming";
-  //   console.log({ image });
+
+  //   Handle restore or removeBackground function work
+  useEffect(() => {
+    if (image && (type === "restore" || type === "removeBackground")) {
+      setNewTransformation(transformationType.config);
+    }
+  }, [image, transformationType.config, type]);
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        {/* Block code to render InsufficientCredit model */}
+        {creditBalance < Math.abs(creditFee) && <InsufficientCreditsModal />}
+
         {/* block code to render Image Title */}
         <CustomField
           control={form.control}
