@@ -27,7 +27,7 @@ export default function RootLayout({
       }}
     >
       <html lang="en">
-        <body className={cn("font-ibm-plex antialiased", ibm_plex.variable)}>
+        <body className={cn("font-ibm_plex antialiased", ibm_plex.variable)}>
           {children}
         </body>
       </html>

@@ -22,6 +22,7 @@ import {
 import { AspectRatioKey, debounce, deepMergeObjects } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { updateCredits } from "@/lib/actions/user.action";
+import MediaUploader from "./MediaUploader";
 
 export const formSchema = z.object({
   title: z.string(),
@@ -222,6 +223,24 @@ const TransformationForm = ({
             )}
           </div>
         )}
+
+        {/* block code to render upload Widget from Cloudinary */}
+        <div className="media-uploader-field">
+          <CustomField
+            control={form.control}
+            name="publicId"
+            className="flex size-full flex-col"
+            render={({ field }) => (
+              <MediaUploader
+                onValueChange={field.onChange}
+                setImage={setImage}
+                publicId={field.value}
+                image={image}
+                type={type}
+              />
+            )}
+          />
+        </div>
 
         {/* block code to render 2 buttons */}
         <div className="flex flex-col gap-4">
